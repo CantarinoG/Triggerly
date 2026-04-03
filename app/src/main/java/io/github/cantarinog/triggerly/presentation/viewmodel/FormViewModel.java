@@ -1,17 +1,32 @@
 package io.github.cantarinog.triggerly.presentation.viewmodel;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.time.LocalTime;
 
 import io.github.cantarinog.triggerly.domain.model.Reminder;
+import io.github.cantarinog.triggerly.domain.usecase.GetRemindersUseCase;
 import io.github.cantarinog.triggerly.domain.usecase.SaveReminderUseCase;
 
 public class FormViewModel extends ViewModel {
     private final SaveReminderUseCase saveReminderUseCase;
+    private final GetRemindersUseCase getRemindersUseCase;
+    
+    private final MutableLiveData<Reminder> _reminder = new MutableLiveData<>();
+    public final LiveData<Reminder> reminder = _reminder;
 
-    public FormViewModel(SaveReminderUseCase saveReminderUseCase) {
+    public FormViewModel(SaveReminderUseCase saveReminderUseCase, GetRemindersUseCase getRemindersUseCase) {
         this.saveReminderUseCase = saveReminderUseCase;
+        this.getRemindersUseCase = getRemindersUseCase;
+    }
+
+    public void loadReminder(String id) {
+        new Thread(() -> {
+            Reminder r = getRemindersUseCase.execute(id);
+            _reminder.postValue(r);
+        }).start();
     }
 
     public void saveReminder(
@@ -40,3 +55,4 @@ public class FormViewModel extends ViewModel {
         }).start();
     }
 }
+

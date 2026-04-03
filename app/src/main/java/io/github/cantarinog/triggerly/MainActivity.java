@@ -17,6 +17,8 @@ import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModel;
 import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModelFactory;
 import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
 
+import io.github.cantarinog.triggerly.presentation.ui.ReminderFormActivity;
+
 public class MainActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     private ReminderAdapter adapter;
@@ -50,8 +52,9 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerViewReminders);
         adapter = new ReminderAdapter(
                 reminder -> {
-                    // TODO: Open edit screen
-                    Log.d("MainActivity", "Clicked: " + reminder.name());
+                    android.content.Intent intent = new android.content.Intent(this, ReminderFormActivity.class);
+                    intent.putExtra(ReminderFormActivity.EXTRA_REMINDER_ID, reminder.id());
+                    startActivity(intent);
                 },
                 reminder -> showDeleteDialog(reminder)
         );

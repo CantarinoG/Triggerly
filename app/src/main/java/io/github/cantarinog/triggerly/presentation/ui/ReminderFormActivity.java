@@ -23,8 +23,10 @@ import io.github.cantarinog.triggerly.domain.usecase.SaveReminderUseCase;
 import io.github.cantarinog.triggerly.presentation.viewmodel.FormViewModel;
 import io.github.cantarinog.triggerly.presentation.viewmodel.FormViewModelFactory;
 import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
+import io.github.cantarinog.triggerly.domain.usecase.GetRemindersUseCase;
 
 public class ReminderFormActivity extends AppCompatActivity {
+    public static final String EXTRA_REMINDER_ID = "reminder_id";
 
     private TextInputEditText editTextName;
     private TextInputEditText editTextDescription;
@@ -33,6 +35,7 @@ public class ReminderFormActivity extends AppCompatActivity {
     private Slider sliderFrequency;
     private Button buttonSave;
 
+    private String reminderId = null;
     private LocalTime startTime = LocalTime.of(9, 0);
     private LocalTime endTime = LocalTime.of(18, 0);
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -44,9 +47,20 @@ public class ReminderFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_form);
 
+        reminderId = getIntent().getStringExtra(EXTRA_REMINDER_ID);
+        if (reminderId != null) {
+            setTitle("Edit Reminder");
+        } else {
+            setTitle("New Reminder");
+        }
+
         initViews();
         setupViewModel();
         setupListeners();
+
+        if (reminderId != null) {
+            viewModel.loadReminder(reminderId);
+        }
     }
 
     private void initViews() {
@@ -67,9 +81,21 @@ public class ReminderFormActivity extends AppCompatActivity {
         AlarmScheduler scheduler = new AlarmSchedulerImpl(this);
         GenerateRandomTimestampsUseCase generateUseCase = new GenerateRandomTimestampsUseCase();
         SaveReminderUseCase saveUseCase = new SaveReminderUseCase(repository, scheduler, generateUseCase);
+        GetRemindersUseCase getUseCase = new GetRemindersUseCase(repository);
 
-        FormViewModelFactory factory = new FormViewModelFactory(saveUseCase);
+        FormViewModelFactory factory = new FormViewModelFactory(saveUseCase, getUseCase);
         viewModel = new ViewModelProvider(this, factory).get(FormViewModel.class);
+
+        viewModel.reminder.observe(this, reminder -> {
+            if (reminder != null) {
+                editTextName.setText(reminder.name());
+                editTextDescription.setText(reminder.description());
+                startTime = reminder.startTime();
+                endTime = reminder.endTime();
+                sliderFrequency.setValue(reminder.numReminders());
+                updateTimeButtons();
+            }
+        });
     }
 
     private void setupListeners() {
@@ -84,7 +110,7 @@ public class ReminderFormActivity extends AppCompatActivity {
             }
 
             viewModel.saveReminder(
-                    null, // new id
+                    reminderId,
                     name,
                     editTextDescription.getText().toString(),
                     startTime,
