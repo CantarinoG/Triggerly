@@ -15,6 +15,8 @@ import io.github.cantarinog.triggerly.data.local.AppDatabase;
 import io.github.cantarinog.triggerly.data.repository.ReminderRepositoryImpl;
 import io.github.cantarinog.triggerly.domain.model.Reminder;
 import io.github.cantarinog.triggerly.domain.model.TriggerEvent;
+import io.github.cantarinog.triggerly.domain.usecase.FireTriggerUseCase;
+import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
 
 public class NotificationReceiver extends BroadcastReceiver {
     private static final String TAG = "NotificationReceiver";
@@ -40,13 +42,10 @@ public class NotificationReceiver extends BroadcastReceiver {
                 if (reminder != null) {
                     showNotification(context, reminder);
                     
-                    TriggerEvent firedEvent = new TriggerEvent(
-                            currentTrigger.id(),
-                            currentTrigger.reminderId(),
-                            currentTrigger.triggerTime(),
-                            true
-                    );
-                    repository.saveTriggerEvent(firedEvent);
+                    FireTriggerUseCase useCase = 
+                            new FireTriggerUseCase(repository, new AlarmSchedulerImpl(context));
+                    
+                    useCase.execute(triggerId);
                 }
             }
         }).start();
