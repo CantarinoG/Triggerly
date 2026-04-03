@@ -7,15 +7,18 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 import io.github.cantarinog.triggerly.domain.model.Reminder;
+import io.github.cantarinog.triggerly.domain.usecase.DeleteReminderUseCase;
 import io.github.cantarinog.triggerly.domain.usecase.GetRemindersUseCase;
 
 public class MainViewModel extends ViewModel {
     private final GetRemindersUseCase getRemindersUseCase;
+    private final DeleteReminderUseCase deleteReminderUseCase;
     private final MutableLiveData<List<Reminder>> _reminders = new MutableLiveData<>();
     public final LiveData<List<Reminder>> reminders = _reminders;
 
-    public MainViewModel(GetRemindersUseCase getRemindersUseCase) {
+    public MainViewModel(GetRemindersUseCase getRemindersUseCase, DeleteReminderUseCase deleteReminderUseCase) {
         this.getRemindersUseCase = getRemindersUseCase;
+        this.deleteReminderUseCase = deleteReminderUseCase;
         loadReminders();
     }
 
@@ -25,4 +28,12 @@ public class MainViewModel extends ViewModel {
             _reminders.postValue(list);
         }).start();
     }
+
+    public void deleteReminder(String id) {
+        new Thread(() -> {
+            deleteReminderUseCase.execute(id);
+            loadReminders();
+        }).start();
+    }
 }
+

@@ -4,13 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import io.github.cantarinog.triggerly.domain.usecase.DeleteReminderUseCase;
 import io.github.cantarinog.triggerly.domain.usecase.GetRemindersUseCase;
 
 public class MainViewModelFactory implements ViewModelProvider.Factory {
     private final GetRemindersUseCase getRemindersUseCase;
+    private final DeleteReminderUseCase deleteReminderUseCase;
 
-    public MainViewModelFactory(GetRemindersUseCase getRemindersUseCase) {
+    public MainViewModelFactory(GetRemindersUseCase getRemindersUseCase, DeleteReminderUseCase deleteReminderUseCase) {
         this.getRemindersUseCase = getRemindersUseCase;
+        this.deleteReminderUseCase = deleteReminderUseCase;
     }
 
     @NonNull
@@ -18,7 +21,7 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            return (T) new MainViewModel(getRemindersUseCase);
+            return (T) new MainViewModel(getRemindersUseCase, deleteReminderUseCase);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

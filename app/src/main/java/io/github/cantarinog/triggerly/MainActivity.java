@@ -7,12 +7,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.util.Log;
 
+import io.github.cantarinog.triggerly.domain.model.Reminder;
 import io.github.cantarinog.triggerly.data.local.AppDatabase;
 import io.github.cantarinog.triggerly.data.repository.ReminderRepositoryImpl;
+import io.github.cantarinog.triggerly.domain.usecase.DeleteReminderUseCase;
 import io.github.cantarinog.triggerly.domain.usecase.GetRemindersUseCase;
 import io.github.cantarinog.triggerly.presentation.ui.ReminderAdapter;
 import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModel;
 import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModelFactory;
+import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
 
 public class MainActivity extends AppCompatActivity {
     private MainViewModel viewModel;
@@ -36,19 +39,32 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db = androidx.room.Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "triggerly-db").build();
         ReminderRepositoryImpl repository = new ReminderRepositoryImpl(db.reminderDao(), db.triggerEventDao());
-        GetRemindersUseCase useCase = new GetRemindersUseCase(repository);
+        GetRemindersUseCase getUseCase = new GetRemindersUseCase(repository);
+        DeleteReminderUseCase deleteUseCase = new DeleteReminderUseCase(repository, new AlarmSchedulerImpl(this));
         
-        MainViewModelFactory factory = new MainViewModelFactory(useCase);
+        MainViewModelFactory factory = new MainViewModelFactory(getUseCase, deleteUseCase);
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
     }
 
     private void setupRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recyclerViewReminders);
-        adapter = new ReminderAdapter(reminder -> {
-            // TODO: Open edit screen
-            Log.d("MainActivity", "Clicked: " + reminder.name());
-        });
+        adapter = new ReminderAdapter(
+                reminder -> {
+                    // TODO: Open edit screen
+                    Log.d("MainActivity", "Clicked: " + reminder.name());
+                },
+                reminder -> showDeleteDialog(reminder)
+        );
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showDeleteDialog(Reminder reminder) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Delete Reminder")
+                .setMessage("Are you sure you want to delete '" + reminder.name() + "'? This will stop all randomized alarms for this item.")
+                .setPositiveButton("Delete", (dialog, which) -> viewModel.deleteReminder(reminder.id()))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void setupFab() {

@@ -20,15 +20,21 @@ import io.github.cantarinog.triggerly.domain.model.Reminder;
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHolder> {
 
     private final List<Reminder> reminders = new ArrayList<>();
-    private final OnReminderClickListener listener;
+    private final OnReminderClickListener clickListener;
+    private final OnReminderLongClickListener longClickListener;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     public interface OnReminderClickListener {
         void onReminderClick(Reminder reminder);
     }
 
-    public ReminderAdapter(OnReminderClickListener listener) {
-        this.listener = listener;
+    public interface OnReminderLongClickListener {
+        void onReminderLongClick(Reminder reminder);
+    }
+
+    public ReminderAdapter(OnReminderClickListener clickListener, OnReminderLongClickListener longClickListener) {
+        this.clickListener = clickListener;
+        this.longClickListener = longClickListener;
     }
 
     public void setReminders(List<Reminder> newReminders) {
@@ -48,7 +54,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reminder reminder = reminders.get(position);
-        holder.bind(reminder, listener);
+        holder.bind(reminder, clickListener, longClickListener);
     }
 
     @Override
@@ -72,7 +78,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             colorIndicator = itemView.findViewById(R.id.colorIndicator);
         }
 
-        public void bind(Reminder reminder, OnReminderClickListener listener) {
+        public void bind(Reminder reminder, OnReminderClickListener clickListener, OnReminderLongClickListener longClickListener) {
             textViewName.setText(reminder.name());
             textViewDescription.setText(reminder.description());
             
@@ -92,7 +98,11 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             }
             colorIndicator.setBackground(shape);
 
-            itemView.setOnClickListener(v -> listener.onReminderClick(reminder));
+            itemView.setOnClickListener(v -> clickListener.onReminderClick(reminder));
+            itemView.setOnLongClickListener(v -> {
+                longClickListener.onReminderLongClick(reminder);
+                return true;
+            });
         }
     }
 }
