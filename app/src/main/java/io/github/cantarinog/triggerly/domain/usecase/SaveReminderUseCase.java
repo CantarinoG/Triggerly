@@ -24,12 +24,17 @@ public class SaveReminderUseCase {
     }
 
     public void execute(Reminder reminder) {
+        List<TriggerEvent> oldTriggers = reminderRepository.getTriggerEventsForReminder(reminder.id());
+        
+        for (TriggerEvent oldTrigger : oldTriggers) {
+            alarmScheduler.cancel(oldTrigger);
+        }
+        if (!oldTriggers.isEmpty()) {
+            reminderRepository.deleteTriggerEventsByReminderId(reminder.id());
+        }
+
         reminderRepository.saveReminder(reminder);
-        /* 
-         * Note: If this is an update, we should technically pull the old TriggerEvents 
-         * and call alarmScheduler.cancel() on them before we create new ones.
-         * We will need to add a feature to the repository to fetch triggers for a reminder.
-         */
+
         LocalDate targetDate = LocalDate.now();
 
         List<LocalDateTime> randomTimes = generateRandomTimestampsUseCase.execute(
@@ -47,6 +52,7 @@ public class SaveReminderUseCase {
                     false
             );
 
+            reminderRepository.saveTriggerEvent(newTrigger);
             alarmScheduler.schedule(newTrigger);
         }
     }

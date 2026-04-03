@@ -8,4 +8,8 @@ public interface ReminderRepository {
     List<Reminder> getAllReminders();
     Reminder getReminderById(String id);
     void deleteReminder(String id);
+    
+    void saveTriggerEvent(TriggerEvent triggerEvent);
+    List<TriggerEvent> getTriggerEventsForReminder(String reminderId);
+    void deleteTriggerEventsByReminderId(String reminderId);
 }
