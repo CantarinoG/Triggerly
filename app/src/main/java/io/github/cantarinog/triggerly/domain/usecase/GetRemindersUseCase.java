@@ -15,4 +15,8 @@ public class GetRemindersUseCase {
     public List<Reminder> execute() {
         return reminderRepository.getAllReminders();
     }
+
+    public Reminder execute(String id) {
+        return reminderRepository.getReminderById(id);
+    }
 }
