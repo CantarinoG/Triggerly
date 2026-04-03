@@ -13,4 +13,5 @@ public interface ReminderRepository {
     void saveTriggerEvent(TriggerEvent triggerEvent);
     List<TriggerEvent> getTriggerEventsForReminder(String reminderId);
     void deleteTriggerEventsByReminderId(String reminderId);
+    List<TriggerEvent> getAllPendingTriggers();
 }
