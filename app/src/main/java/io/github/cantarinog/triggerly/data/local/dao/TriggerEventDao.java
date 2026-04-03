@@ -22,4 +22,7 @@ public interface TriggerEventDao {
 
     @Query("SELECT * FROM trigger_events WHERE isFired = 0")
     List<TriggerEventEntity> getAllPendingTriggers();
+
+    @Query("SELECT * FROM trigger_events WHERE id = :id")
+    TriggerEventEntity getTriggerById(String id);
 }

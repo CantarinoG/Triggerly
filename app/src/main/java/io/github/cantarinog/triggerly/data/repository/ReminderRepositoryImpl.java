@@ -67,4 +67,10 @@ public class ReminderRepositoryImpl implements ReminderRepository {
                 .map(TriggerEventEntity::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public TriggerEvent getTriggerById(String id) {
+        TriggerEventEntity entity = triggerEventDao.getTriggerById(id);
+        return entity != null ? entity.toDomain() : null;
+    }
 }
