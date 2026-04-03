@@ -20,9 +20,6 @@ public class DeleteReminderUseCase {
         for (TriggerEvent trigger : triggers) {
             alarmScheduler.cancel(trigger);
         }
-        
-        reminderRepository.deleteTriggerEventsByReminderId(reminderId);
-
         reminderRepository.deleteReminder(reminderId);
     }
 }
