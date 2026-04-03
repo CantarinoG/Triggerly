@@ -27,6 +27,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".presentation.ui.ReminderFormActivity"
+            android:exported="false"
+            android:label="New Reminder" />
+
         <receiver
             android:name=".service.NotificationReceiver"
             android:exported="false" />
