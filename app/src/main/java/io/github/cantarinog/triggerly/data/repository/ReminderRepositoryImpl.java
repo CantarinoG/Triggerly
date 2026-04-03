@@ -60,4 +60,17 @@ public class ReminderRepositoryImpl implements ReminderRepository {
     public void deleteTriggerEventsByReminderId(String reminderId) {
         triggerEventDao.deleteTriggerEventsByReminderId(reminderId);
     }
+
+    @Override
+    public List<TriggerEvent> getAllPendingTriggers() {
+        return triggerEventDao.getAllPendingTriggers().stream()
+                .map(TriggerEventEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TriggerEvent getTriggerById(String id) {
+        TriggerEventEntity entity = triggerEventDao.getTriggerById(id);
+        return entity != null ? entity.toDomain() : null;
+    }
 }

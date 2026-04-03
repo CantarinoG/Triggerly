@@ -19,4 +19,10 @@ public interface TriggerEventDao {
 
     @Query("DELETE FROM trigger_events WHERE reminderId = :reminderId")
     void deleteTriggerEventsByReminderId(String reminderId);
+
+    @Query("SELECT * FROM trigger_events WHERE isFired = 0")
+    List<TriggerEventEntity> getAllPendingTriggers();
+
+    @Query("SELECT * FROM trigger_events WHERE id = :id")
+    TriggerEventEntity getTriggerById(String id);
 }
