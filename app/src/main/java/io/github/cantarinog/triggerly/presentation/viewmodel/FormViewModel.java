@@ -37,11 +37,12 @@ public class FormViewModel extends ViewModel {
             LocalTime startTime,
             LocalTime endTime,
             int count,
-            String colorHex
+            String colorHex,
+            String soundUri
     ) {
         new Thread(() -> {
             Reminder reminder = new Reminder(
-                    id != null ? id : java.util.UUID.randomUUID().toString(),
+                    id,
                     name,
                     description,
                     iconName != null ? iconName : "ic_water_drop",
@@ -50,7 +51,7 @@ public class FormViewModel extends ViewModel {
                     startTime,
                     endTime,
                     count,
-                    null
+                    soundUri
             );
             saveReminderUseCase.execute(reminder);
         }).start();

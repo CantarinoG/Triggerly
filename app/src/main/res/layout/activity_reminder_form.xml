@@ -242,12 +242,35 @@
                         app:tint="@android:color/white" />
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.1"
+                    android:text="NOTIFICATION SOUND"
+                    android:textColor="@color/navy_light"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/textViewSoundName"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_icon"
+                    android:backgroundTint="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="Default Pulse"
+                    android:textColor="@color/navy_dark"
+                    app:drawableEndCompat="@drawable/ic_repeat"
+                    app:drawableTint="@color/navy_dark" />
+
             </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Save Button Container -->
     <FrameLayout
         android:id="@+id/buttonSaveContainer"
         android:layout_width="match_parent"

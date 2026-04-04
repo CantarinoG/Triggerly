@@ -41,6 +41,10 @@ public class ReminderFormActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewIcons;
     private RecyclerView recyclerViewColors;
+    private TextView textViewSoundName;
+
+    private static final int REQUEST_CODE_SOUND_PICKER = 1001;
+    private String selectedSoundUri = null;
 
     private final String[] icons = {"ic_water_drop", "ic_target", "ic_person", "ic_medical", "ic_gym", "ic_lightbulb", "ic_book", "ic_bell"};
     private final String[] colors = {"#2962FF", "#00838F", "#AD1457", "#B71C1C", "#7986CB", "#00E5FF", "#F06292", "#2D3250"};
@@ -84,6 +88,7 @@ public class ReminderFormActivity extends AppCompatActivity {
         buttonBack = findViewById(R.id.buttonBack);
         recyclerViewIcons = findViewById(R.id.recyclerViewIcons);
         recyclerViewColors = findViewById(R.id.recyclerViewColors);
+        textViewSoundName = findViewById(R.id.textViewSoundName);
 
         updateTimeTexts();
         updateFrequencyText();
@@ -231,6 +236,14 @@ public class ReminderFormActivity extends AppCompatActivity {
                 frequency = reminder.numReminders();
                 selectedColor = reminder.colorHex();
                 selectedIcon = reminder.iconName();
+                selectedSoundUri = reminder.soundUri();
+
+                if (selectedSoundUri != null) {
+                    android.media.Ringtone ringtone = android.media.RingtoneManager.getRingtone(this, android.net.Uri.parse(selectedSoundUri));
+                    if (ringtone != null) {
+                        textViewSoundName.setText(ringtone.getTitle(this));
+                    }
+                }
                 updateTimeTexts();
                 updateFrequencyText();
             }
@@ -272,12 +285,38 @@ public class ReminderFormActivity extends AppCompatActivity {
                     startTime,
                     endTime,
                     frequency,
-                    selectedColor
+                    selectedColor,
+                    selectedSoundUri
             );
             
             Toast.makeText(this, "Reminder saved!", Toast.LENGTH_SHORT).show();
             finish();
         });
+
+        textViewSoundName.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER);
+            intent.putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_NOTIFICATION);
+            intent.putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Notification Sound");
+            intent.putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, 
+                selectedSoundUri != null ? android.net.Uri.parse(selectedSoundUri) : (android.net.Uri) null);
+            startActivityForResult(intent, REQUEST_CODE_SOUND_PICKER);
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SOUND_PICKER && resultCode == RESULT_OK) {
+            android.net.Uri uri = data.getParcelableExtra(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            if (uri != null) {
+                selectedSoundUri = uri.toString();
+                android.media.Ringtone ringtone = android.media.RingtoneManager.getRingtone(this, uri);
+                textViewSoundName.setText(ringtone.getTitle(this));
+            } else {
+                selectedSoundUri = null;
+                textViewSoundName.setText("Silent");
+            }
+        }
     }
 
     private void showTimePicker(boolean isStart) {
