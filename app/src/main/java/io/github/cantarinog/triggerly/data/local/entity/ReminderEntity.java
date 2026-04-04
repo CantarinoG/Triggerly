@@ -16,7 +16,6 @@ public class ReminderEntity {
     public String description;
     public String iconName;
     public String colorHex;
-    public String imageUri;
     public String startTime;
     public String endTime;
     public int numReminders;
@@ -31,7 +30,6 @@ public class ReminderEntity {
         entity.description = reminder.description();
         entity.iconName = reminder.iconName();
         entity.colorHex = reminder.colorHex();
-        entity.imageUri = reminder.imageUri();
         entity.startTime = reminder.startTime().toString();
         entity.endTime = reminder.endTime().toString();
         entity.numReminders = reminder.numReminders();
@@ -46,7 +44,6 @@ public class ReminderEntity {
             description,
             iconName,
             colorHex,
-            imageUri,
             java.time.LocalTime.parse(startTime),
             java.time.LocalTime.parse(endTime),
             numReminders,

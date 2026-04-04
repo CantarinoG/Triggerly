@@ -9,7 +9,6 @@ public record Reminder(
     String description,
     String iconName,
     String colorHex,
-    String imageUri,
     LocalTime startTime,
     LocalTime endTime,
     int numReminders,

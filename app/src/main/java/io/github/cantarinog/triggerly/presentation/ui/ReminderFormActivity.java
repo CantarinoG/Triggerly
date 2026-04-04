@@ -1,6 +1,5 @@
 package io.github.cantarinog.triggerly.presentation.ui;
 
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -217,7 +216,9 @@ public class ReminderFormActivity extends AppCompatActivity {
 
     private void setupViewModel() {
         AppDatabase db = androidx.room.Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "triggerly-db").build();
+                AppDatabase.class, "triggerly-db")
+                .fallbackToDestructiveMigration()
+                .build();
         ReminderRepositoryImpl repository = new ReminderRepositoryImpl(db.reminderDao(), db.triggerEventDao());
         AlarmScheduler scheduler = new AlarmSchedulerImpl(this);
         GenerateRandomTimestampsUseCase generateUseCase = new GenerateRandomTimestampsUseCase();
@@ -321,12 +322,21 @@ public class ReminderFormActivity extends AppCompatActivity {
 
     private void showTimePicker(boolean isStart) {
         LocalTime initial = isStart ? startTime : endTime;
-        TimePickerDialog picker = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            if (isStart) startTime = LocalTime.of(hourOfDay, minute);
-            else endTime = LocalTime.of(hourOfDay, minute);
+        com.google.android.material.timepicker.MaterialTimePicker picker = 
+            new com.google.android.material.timepicker.MaterialTimePicker.Builder()
+                .setTimeFormat(com.google.android.material.timepicker.TimeFormat.CLOCK_24H)
+                .setHour(initial.getHour())
+                .setMinute(initial.getMinute())
+                .setTitleText(isStart ? "Select Start Time" : "Select End Time")
+                .build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            if (isStart) startTime = LocalTime.of(picker.getHour(), picker.getMinute());
+            else endTime = LocalTime.of(picker.getHour(), picker.getMinute());
             updateTimeTexts();
-        }, initial.getHour(), initial.getMinute(), true);
-        picker.show();
+        });
+        
+        picker.show(getSupportFragmentManager(), "TIME_PICKER");
     }
 
     private void updateTimeTexts() {

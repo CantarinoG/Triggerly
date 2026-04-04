@@ -47,7 +47,6 @@ public class FormViewModel extends ViewModel {
                     description,
                     iconName != null ? iconName : "ic_water_drop",
                     colorHex != null ? colorHex : "#2962FF",
-                    null,
                     startTime,
                     endTime,
                     count,
