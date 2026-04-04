@@ -49,6 +49,17 @@ Triggerly follows a robust **MVVM (Model-View-ViewModel)** architecture combined
 3. **Manage**: Long-press on a reminder to delete it.
 4. **Notifications**: Stay informed with timely alerts that pop up even when the app is closed.
 
+## 🔋 Battery Optimization (Critical)
+
+For Triggerly to deliver notifications reliably while the device is in sleep mode (Doze mode), it must be excluded from battery optimization:
+
+1. Open **Settings** on your device.
+2. Navigate to **Apps > Triggerly**.
+3. Tap on **Battery**.
+4. Select **"Unrestricted"**.
+
+Without this setting, Android may delay or suppress randomized triggers to save power, causing notifications to only appear when the app is manually opened.
+
 ---
 
 *Made with ❤️ for a better productivity experience.*
