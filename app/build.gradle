@@ -4,16 +4,11 @@ plugins {
 
 android {
     namespace 'io.github.cantarinog.triggerly'
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
-
+    compileSdk 35
     defaultConfig {
         applicationId "io.github.cantarinog.triggerly"
         minSdk 34
-        targetSdk 36
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 

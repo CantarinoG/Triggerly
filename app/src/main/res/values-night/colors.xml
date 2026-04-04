@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy_dark">#D1D4E0</color>
+    <color name="navy_light">#A1A2AA</color>
+    <color name="cyan_accent">#004D40</color>
+    <color name="flow_blue">#448AFF</color>
+    <color name="pulse_gray">#8A8E99</color>
+    <color name="app_background">#121420</color>
+
+    <color name="form_field_bg">#1F2235</color>
+    <color name="form_section_bg">#1A1C3E</color>
+    
+    <color name="card_surface">#2A2D3E</color>
+    <color name="card_stroke">#3D4258</color>
+</resources>

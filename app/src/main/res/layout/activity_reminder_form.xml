@@ -1,12 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:fitsSystemWindows="true">
+
+    <!-- Header -->
+    <ImageButton
+        android:id="@+id/buttonBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_revert"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/navy_dark"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="sans-serif-black"
+        android:text="New Reminder"
+        android:textColor="@color/navy_dark"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@id/buttonBack"
+        app:layout_constraintStart_toEndOf="@id/buttonBack"
+        app:layout_constraintTop_toTopOf="@id/buttonBack" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@id/buttonSaveContainer"
+        app:layout_constraintTop_toBottomOf="@id/buttonBack">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -14,91 +47,225 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Reminder Name">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Description (optional)">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
+            <!-- NAME -->
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:text="NAME"
+                android:textColor="@color/pulse_gray"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/editTextName"
                 android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_form_field"
+                android:hint="e.g., Daily Hydration"
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="20dp"
+                android:textColor="@color/navy_dark"
+                android:textColorHint="@color/pulse_gray"
+                android:textSize="16sp" />
+
+            <!-- DESCRIPTION -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Time Window"
-                android:textAppearance="?attr/textAppearanceSubtitle1" />
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:text="DESCRIPTION"
+                android:textColor="@color/pulse_gray"
+                android:textSize="12sp" />
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/editTextDescription"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_form_field"
+                android:gravity="top"
+                android:hint="A short note about this trigger..."
+                android:inputType="textMultiLine|textCapSentences"
+                android:padding="20dp"
+                android:textColor="@color/navy_dark"
+                android:textColorHint="@color/pulse_gray"
+                android:textSize="16sp" />
+
+            <!-- ICON SECTION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:text="ICON"
+                android:textColor="@color/pulse_gray"
+                android:textSize="12sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewIcons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+                android:background="@drawable/bg_form_field"
+                android:padding="12dp"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
+                tools:listitem="@android:layout/simple_list_item_1" />
 
-                <Button
-                    android:id="@+id/buttonStartTime"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Starts: 09:00" />
+            <!-- COLOR PALETTE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:text="COLOR PALETTE"
+                android:textColor="@color/pulse_gray"
+                android:textSize="12sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewColors"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_form_field"
+                android:padding="12dp"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
+                tools:listitem="@android:layout/simple_list_item_1" />
+
+            <!-- TIME & FREQUENCY SECTION -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_form_section"
+                android:orientation="vertical"
+                android:padding="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="to" />
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.1"
+                    android:text="START TIME"
+                    android:textColor="@color/navy_light"
+                    android:textSize="12sp" />
 
-                <Button
-                    android:id="@+id/buttonEndTime"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/textViewStartTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_icon"
+                    android:backgroundTint="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="--:-- "
+                    android:textColor="@color/navy_dark"
+                    app:drawableEndCompat="@drawable/ic_clock"
+                    app:drawableTint="@color/navy_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Ends: 18:00" />
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.1"
+                    android:text="END TIME"
+                    android:textColor="@color/navy_light"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/textViewEndTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_rounded_icon"
+                    android:backgroundTint="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="--:-- "
+                    android:textColor="@color/navy_dark"
+                    app:drawableEndCompat="@drawable/ic_clock"
+                    app:drawableTint="@color/navy_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.1"
+                    android:text="FREQUENCY (DAILY)"
+                    android:textColor="@color/navy_light"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/buttonFreqMinus"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_rounded_icon"
+                        android:backgroundTint="@android:color/white"
+                        android:src="@android:drawable/button_onoff_indicator_off"
+                        app:tint="@color/navy_dark" />
+
+                    <TextView
+                        android:id="@+id/textViewFrequency"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="8"
+                        android:textColor="@color/navy_dark"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/buttonFreqPlus"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_rounded_icon"
+                        android:backgroundTint="@color/flow_blue"
+                        android:src="@android:drawable/ic_input_add"
+                        app:tint="@android:color/white" />
+                </LinearLayout>
+
             </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Triggers per day"
-                android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/sliderFrequency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:value="5"
-                android:valueFrom="1"
-                android:valueTo="20"
-                app:labelBehavior="withinBounds" />
-
-            <Button
-                android:id="@+id/buttonSave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:padding="12dp"
-                android:text="Save Reminder" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!-- Save Button Container -->
+    <FrameLayout
+        android:id="@+id/buttonSaveContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_save_button"
+            android:fontFamily="sans-serif-medium"
+            android:text="Save Reminder"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@null" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

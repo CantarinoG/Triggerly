@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,7 +68,8 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         private final TextView textViewDescription;
         private final TextView textViewTimeWindow;
         private final TextView textViewCount;
-        private final View colorIndicator;
+        private final View iconContainer;
+        private final ImageView imageViewIcon;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,7 +77,8 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             textViewDescription = itemView.findViewById(R.id.textViewDescription);
             textViewTimeWindow = itemView.findViewById(R.id.textViewTimeWindow);
             textViewCount = itemView.findViewById(R.id.textViewCount);
-            colorIndicator = itemView.findViewById(R.id.colorIndicator);
+            iconContainer = itemView.findViewById(R.id.iconContainer);
+            imageViewIcon = itemView.findViewById(R.id.imageViewIcon);
         }
 
         public void bind(Reminder reminder, OnReminderClickListener clickListener, OnReminderLongClickListener longClickListener) {
@@ -86,16 +89,24 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             String window = reminder.startTime().format(fmt) + " - " + reminder.endTime().format(fmt);
             textViewTimeWindow.setText(window);
             
-            textViewCount.setText(reminder.numReminders() + " triggers");
+            textViewCount.setText(String.valueOf(reminder.numReminders()));
 
-            GradientDrawable shape = new GradientDrawable();
-            shape.setShape(GradientDrawable.OVAL);
-            try {
-                shape.setColor(Color.parseColor(reminder.colorHex()));
-            } catch (Exception e) {
-                shape.setColor(Color.LTGRAY);
+            // Dynamic icon and color
+            int iconResId = itemView.getContext().getResources().getIdentifier(
+                    reminder.iconName(), "drawable", itemView.getContext().getPackageName());
+            if (iconResId != 0) {
+                imageViewIcon.setImageResource(iconResId);
+            } else {
+                imageViewIcon.setImageResource(R.drawable.ic_water_drop);
             }
-            colorIndicator.setBackground(shape);
+
+            try {
+                int color = Color.parseColor(reminder.colorHex());
+                iconContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+            } catch (Exception e) {
+                // Fallback to default blue if color parsing fails
+                iconContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#2962FF")));
+            }
 
             itemView.setOnClickListener(v -> clickListener.onReminderClick(reminder));
             itemView.setOnLongClickListener(v -> {
