@@ -16,7 +16,7 @@ import io.github.cantarinog.triggerly.presentation.ui.ReminderAdapter;
 import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModel;
 import io.github.cantarinog.triggerly.presentation.viewmodel.MainViewModelFactory;
 import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
-
+import io.github.cantarinog.triggerly.presentation.ui.ReminderFormActivity;
 import io.github.cantarinog.triggerly.presentation.ui.ReminderFormActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupFab() {
         FloatingActionButton fab = findViewById(R.id.fabAddReminder);
         fab.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(this, io.github.cantarinog.triggerly.presentation.ui.ReminderFormActivity.class);
+            android.content.Intent intent = new android.content.Intent(this, ReminderFormActivity.class);
             startActivity(intent);
         });
     }

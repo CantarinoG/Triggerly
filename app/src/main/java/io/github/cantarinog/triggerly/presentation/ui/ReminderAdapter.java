@@ -88,7 +88,6 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             
             textViewCount.setText(reminder.numReminders() + " triggers");
 
-            // Build a circular background with the reminder color
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.OVAL);
             try {
