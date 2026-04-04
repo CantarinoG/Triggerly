@@ -29,7 +29,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         new Thread(() -> {
             AppDatabase db = Room.databaseBuilder(context.getApplicationContext(),
-                    AppDatabase.class, "triggerly-db").build();
+                    AppDatabase.class, "triggerly-db")
+                    .fallbackToDestructiveMigration()
+                    .build();
             ReminderRepositoryImpl repository = new ReminderRepositoryImpl(
                     db.reminderDao(),
                     db.triggerEventDao()
@@ -55,18 +57,48 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationManager notificationManager = 
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        String soundUriStr = reminder.soundUri();
+        String channelId = CHANNEL_ID;
+        android.net.Uri soundUri = null;
+        if (soundUriStr != null && !soundUriStr.isEmpty()) {
+            soundUri = android.net.Uri.parse(soundUriStr);
+            channelId = CHANNEL_ID + "_" + soundUriStr.hashCode();
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID, "Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                    channelId, "Triggerly Reminders", NotificationManager.IMPORTANCE_HIGH);
+            
+            if (soundUri != null) {
+                android.media.AudioAttributes audioAttributes = new android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                        .build();
+                channel.setSound(soundUri, audioAttributes);
+            }
             notificationManager.createNotificationChannel(channel);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info) // Placeholder
+        int iconResId = context.getResources().getIdentifier(
+                reminder.iconName(), "drawable", context.getPackageName());
+        if (iconResId == 0) {
+            iconResId = android.R.drawable.ic_dialog_info;
+        }
+
+        int colorInt = android.graphics.Color.parseColor(reminder.colorHex());
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(iconResId)
                 .setContentTitle(reminder.name())
                 .setContentText(reminder.description())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setColor(colorInt)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setAutoCancel(true);
+
+        if (soundUri != null && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            builder.setSound(soundUri);
+        }
 
         notificationManager.notify(reminder.id().hashCode(), builder.build());
     }
