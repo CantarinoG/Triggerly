@@ -91,7 +91,23 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             
             textViewCount.setText(String.valueOf(reminder.numReminders()));
 
-            // Fixed icons for now to match the "Hydration Sprint" design image
+            // Dynamic icon and color
+            int iconResId = itemView.getContext().getResources().getIdentifier(
+                    reminder.iconName(), "drawable", itemView.getContext().getPackageName());
+            if (iconResId != 0) {
+                imageViewIcon.setImageResource(iconResId);
+            } else {
+                imageViewIcon.setImageResource(R.drawable.ic_water_drop);
+            }
+
+            try {
+                int color = Color.parseColor(reminder.colorHex());
+                iconContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+            } catch (Exception e) {
+                // Fallback to default blue if color parsing fails
+                iconContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#2962FF")));
+            }
+
             itemView.setOnClickListener(v -> clickListener.onReminderClick(reminder));
             itemView.setOnLongClickListener(v -> {
                 longClickListener.onReminderLongClick(reminder);
