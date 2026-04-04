@@ -22,12 +22,21 @@ import io.github.cantarinog.triggerly.presentation.ui.ReminderFormActivity;
 public class MainActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     private ReminderAdapter adapter;
+    private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d("MainActivity", "Notification permission granted");
+                } else {
+                    Log.d("MainActivity", "Notification permission denied");
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkNotificationPermission();
         setupViewModel();
         setupRecyclerView();
         setupFab();
@@ -35,6 +44,15 @@ public class MainActivity extends AppCompatActivity {
         viewModel.reminders.observe(this, reminders -> {
             adapter.setReminders(reminders);
         });
+    }
+
+    private void checkNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != 
+                    android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void setupViewModel() {
