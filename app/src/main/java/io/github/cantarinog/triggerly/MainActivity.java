@@ -56,10 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        AppDatabase db = androidx.room.Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "triggerly-db")
-                .fallbackToDestructiveMigration()
-                .build();
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
         ReminderRepositoryImpl repository = new ReminderRepositoryImpl(db.reminderDao(), db.triggerEventDao());
         GetRemindersUseCase getUseCase = new GetRemindersUseCase(repository);
         DeleteReminderUseCase deleteUseCase = new DeleteReminderUseCase(repository, new AlarmSchedulerImpl(this));

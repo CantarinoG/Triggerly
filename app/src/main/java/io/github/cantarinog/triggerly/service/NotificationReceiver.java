@@ -9,7 +9,6 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
-import androidx.room.Room;
 
 import io.github.cantarinog.triggerly.data.local.AppDatabase;
 import io.github.cantarinog.triggerly.data.repository.ReminderRepositoryImpl;
@@ -27,28 +26,31 @@ public class NotificationReceiver extends BroadcastReceiver {
         String triggerId = intent.getStringExtra("TRIGGER_EVENT_ID");
         if (triggerId == null) return;
 
+        final PendingResult pendingResult = goAsync();
+
         new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(context.getApplicationContext(),
-                    AppDatabase.class, "triggerly-db")
-                    .fallbackToDestructiveMigration()
-                    .build();
-            ReminderRepositoryImpl repository = new ReminderRepositoryImpl(
-                    db.reminderDao(),
-                    db.triggerEventDao()
-            );
+            try {
+                AppDatabase db = AppDatabase.getInstance(context);
+                ReminderRepositoryImpl repository = new ReminderRepositoryImpl(
+                        db.reminderDao(),
+                        db.triggerEventDao()
+                );
 
-            TriggerEvent currentTrigger = repository.getTriggerById(triggerId);
+                TriggerEvent currentTrigger = repository.getTriggerById(triggerId);
 
-            if (currentTrigger != null) {
-                Reminder reminder = repository.getReminderById(currentTrigger.reminderId());
-                if (reminder != null) {
-                    showNotification(context, reminder);
-                    
-                    FireTriggerUseCase useCase = 
-                            new FireTriggerUseCase(repository, new AlarmSchedulerImpl(context));
-                    
-                    useCase.execute(triggerId);
+                if (currentTrigger != null) {
+                    Reminder reminder = repository.getReminderById(currentTrigger.reminderId());
+                    if (reminder != null) {
+                        showNotification(context, reminder);
+
+                        FireTriggerUseCase useCase =
+                                new FireTriggerUseCase(repository, new AlarmSchedulerImpl(context));
+
+                        useCase.execute(triggerId);
+                    }
                 }
+            } finally {
+                pendingResult.finish();
             }
         }).start();
     }
