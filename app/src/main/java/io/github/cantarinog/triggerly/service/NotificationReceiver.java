@@ -15,6 +15,7 @@ import io.github.cantarinog.triggerly.data.repository.ReminderRepositoryImpl;
 import io.github.cantarinog.triggerly.domain.model.Reminder;
 import io.github.cantarinog.triggerly.domain.model.TriggerEvent;
 import io.github.cantarinog.triggerly.domain.usecase.FireTriggerUseCase;
+import io.github.cantarinog.triggerly.domain.usecase.RescheduleAlarmsUseCase;
 import io.github.cantarinog.triggerly.service.AlarmSchedulerImpl;
 
 public class NotificationReceiver extends BroadcastReceiver {
@@ -24,33 +25,52 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String triggerId = intent.getStringExtra("TRIGGER_EVENT_ID");
+        Log.d(TAG, "onReceive called. triggerId=" + triggerId);
         if (triggerId == null) return;
 
         final PendingResult pendingResult = goAsync();
+        Log.d(TAG, "goAsync obtained");
 
         new Thread(() -> {
             try {
+                Log.d(TAG, "[1/5] Getting DB instance...");
                 AppDatabase db = AppDatabase.getInstance(context);
+
+                Log.d(TAG, "[2/5] Querying trigger: " + triggerId);
                 ReminderRepositoryImpl repository = new ReminderRepositoryImpl(
                         db.reminderDao(),
                         db.triggerEventDao()
                 );
-
                 TriggerEvent currentTrigger = repository.getTriggerById(triggerId);
+                Log.d(TAG, "[2/5] Trigger found: " + (currentTrigger != null));
 
                 if (currentTrigger != null) {
+                    Log.d(TAG, "[3/5] Querying reminder: " + currentTrigger.reminderId());
                     Reminder reminder = repository.getReminderById(currentTrigger.reminderId());
+                    Log.d(TAG, "[3/5] Reminder found: " + (reminder != null));
+
                     if (reminder != null) {
+                        Log.d(TAG, "[4/5] Showing notification for: " + reminder.name());
                         showNotification(context, reminder);
 
+                        Log.d(TAG, "[5/5] Firing trigger and scheduling next day...");
                         FireTriggerUseCase useCase =
                                 new FireTriggerUseCase(repository, new AlarmSchedulerImpl(context));
-
                         useCase.execute(triggerId);
+
+                        Log.d(TAG, "[Self-Healing] Checking for missed triggers...");
+                        RescheduleAlarmsUseCase rescheduleUseCase =
+                                new RescheduleAlarmsUseCase(repository, new AlarmSchedulerImpl(context));
+                        rescheduleUseCase.executeMissed();
+
+                        Log.d(TAG, "[DONE] All steps completed successfully for: " + reminder.name());
                     }
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "CRASH in notification pipeline!", e);
             } finally {
                 pendingResult.finish();
+                Log.d(TAG, "pendingResult.finish() called");
             }
         }).start();
     }

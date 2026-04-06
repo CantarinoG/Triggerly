@@ -18,10 +18,18 @@ public class RescheduleAlarmsUseCase {
 
     public void execute() {
         List<TriggerEvent> pendingTriggers = reminderRepository.getAllPendingTriggers();
+        for (TriggerEvent trigger : pendingTriggers) {
+            alarmScheduler.schedule(trigger);
+        }
+    }
+
+    public void executeMissed() {
+        List<TriggerEvent> pendingTriggers = reminderRepository.getAllPendingTriggers();
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tenMinutesAgo = now.minusMinutes(10);
 
         for (TriggerEvent trigger : pendingTriggers) {
-            if (trigger.triggerTime().isAfter(now)) {
+            if (trigger.triggerTime().isBefore(tenMinutesAgo)) {
                 alarmScheduler.schedule(trigger);
             }
         }
